@@ -8,600 +8,106 @@
     <meta name="mobile-web-app-capable" content="yes">
     <title>Car Racing 3D</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            font-family: 'Arial', sans-serif;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000;
-            touch-action: none;
-            overscroll-behavior: none;
-            position: fixed;
-        }
-
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #game-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            max-width: 500px;
-            max-height: 900px;
-            overflow: hidden;
-            background: #000;
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
-        }
-
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; font-family: 'Arial', sans-serif; }
+        html, body { width: 100%; height: 100%; overflow: hidden; background-color: #000; touch-action: none; overscroll-behavior: none; position: fixed; }
+        body { display: flex; justify-content: center; align-items: center; }
+        #game-container { position: relative; width: 100%; height: 100%; max-width: 500px; max-height: 900px; overflow: hidden; background: #000; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
+        canvas { display: block; width: 100%; height: 100%; }
 
         /* === LOADING SCREEN === */
-        #loading-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #1a2a6c 0%, #2c3e50 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            z-index: 100;
-        }
-
-        #loading-screen h1 {
-            font-size: 36px;
-            color: #f1c40f;
-            margin-bottom: 30px;
-            letter-spacing: 3px;
-            text-shadow: 0 0 20px rgba(241, 196, 15, 0.8);
-        }
-
-        .loading-bar-container {
-            width: 60%;
-            max-width: 300px;
-            height: 12px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
-            overflow: hidden;
-            border: 2px solid #fff;
-        }
-
-        .loading-bar {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #27ae60, #f1c40f);
-            border-radius: 10px;
-            transition: width 0.3s;
-        }
-
-        #loading-text {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #bdc3c7;
-            letter-spacing: 2px;
-        }
+        #loading-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a2a6c 0%, #2c3e50 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 100; }
+        #loading-screen h1 { font-size: 36px; color: #f1c40f; margin-bottom: 30px; letter-spacing: 3px; text-shadow: 0 0 20px rgba(241, 196, 15, 0.8); }
+        .loading-bar-container { width: 60%; max-width: 300px; height: 12px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; border: 2px solid #fff; }
+        .loading-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #27ae60, #f1c40f); border-radius: 10px; transition: width 0.3s; }
+        #loading-text { margin-top: 20px; font-size: 14px; color: #bdc3c7; letter-spacing: 2px; }
 
         /* === UI === */
-        #ui-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        .score-board {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(26, 42, 108, 0.9);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 10px;
-            text-align: center;
-            border: 2px solid #fff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-        .score-board span { font-size: 10px; display: block; color: #f1c40f; letter-spacing: 1px;}
+        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+        .score-board { position: absolute; top: 15px; left: 15px; background: rgba(26, 42, 108, 0.9); color: white; padding: 8px 16px; border-radius: 10px; text-align: center; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .score-board span { font-size: 10px; display: block; color: #f1c40f; letter-spacing: 1px; }
         .score-board strong { font-size: 22px; display: block; }
-
-        .coin-board {
-            position: absolute;
-            top: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(26, 42, 108, 0.9);
-            color: white;
-            padding: 6px 20px;
-            border-radius: 20px;
-            border: 2px solid #fff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            text-align: center;
-            min-width: 80px;
-        }
-        .coin-board .coin-label {
-            font-size: 10px;
-            color: #f1c40f;
-            letter-spacing: 2px;
-            display: block;
-            font-weight: bold;
-            margin-bottom: 2px;
-        }
-        .coin-board .coin-value {
-            font-size: 22px;
-            color: #ffd700;
-            font-weight: bold;
-            display: block;
-            line-height: 1;
-        }
-
-        .pause-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 40px;
-            height: 40px;
-            background: rgba(41, 128, 185, 0.9);
-            color: white;
-            border: 2px solid #fff;
-            border-radius: 10px;
-            font-size: 18px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            pointer-events: auto;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-
-        .sound-btn {
-            position: absolute;
-            top: 15px;
-            right: 65px;
-            width: 40px;
-            height: 40px;
-            background: rgba(41, 128, 185, 0.9);
-            color: white;
-            border: 2px solid #fff;
-            border-radius: 10px;
-            font-size: 16px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            pointer-events: auto;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-        .sound-btn.muted {
-            background: rgba(231, 76, 60, 0.9);
-        }
-
-        .speedometer {
-            position: absolute;
-            bottom: 100px;
-            right: 15px;
-            width: 75px;
-            height: 75px;
-            background: rgba(26, 42, 108, 0.9);
-            border-radius: 50%;
-            border: 3px solid #3498db;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
-        }
+        .coin-board { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: rgba(26, 42, 108, 0.9); color: white; padding: 6px 20px; border-radius: 20px; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.5); text-align: center; min-width: 80px; }
+        .coin-board .coin-label { font-size: 10px; color: #f1c40f; letter-spacing: 2px; display: block; font-weight: bold; margin-bottom: 2px; }
+        .coin-board .coin-value { font-size: 22px; color: #ffd700; font-weight: bold; display: block; line-height: 1; }
+        .pause-btn { position: absolute; top: 15px; right: 15px; width: 40px; height: 40px; background: rgba(41, 128, 185, 0.9); color: white; border: 2px solid #fff; border-radius: 10px; font-size: 18px; display: flex; justify-content: center; align-items: center; pointer-events: auto; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .sound-btn { position: absolute; top: 15px; right: 65px; width: 40px; height: 40px; background: rgba(41, 128, 185, 0.9); color: white; border: 2px solid #fff; border-radius: 10px; font-size: 16px; display: flex; justify-content: center; align-items: center; pointer-events: auto; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .sound-btn.muted { background: rgba(231, 76, 60, 0.9); }
+        .speedometer { position: absolute; bottom: 100px; right: 15px; width: 75px; height: 75px; background: rgba(26, 42, 108, 0.9); border-radius: 50%; border: 3px solid #3498db; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
         .speedometer .speed-val { font-size: 20px; font-weight: bold; }
         .speedometer .speed-unit { font-size: 9px; color: #f1c40f; }
-
-        .controls {
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 25px;
-            pointer-events: auto;
-        }
-        .control-btn {
-            width: 70px;
-            height: 70px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.6);
-            border-radius: 50%;
-            color: white;
-            font-size: 28px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            backdrop-filter: blur(5px);
-            transition: background 0.1s, transform 0.1s;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .control-btn:active { 
-            background: rgba(255, 255, 255, 0.4); 
-            transform: scale(0.95);
-        }
+        .controls { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 25px; pointer-events: auto; }
+        .control-btn { width: 70px; height: 70px; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.6); border-radius: 50%; color: white; font-size: 28px; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(5px); transition: background 0.1s, transform 0.1s; -webkit-tap-highlight-color: transparent; }
+        .control-btn:active { background: rgba(255, 255, 255, 0.4); transform: scale(0.95); }
 
         /* === START SCREEN === */
-        #start-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #1a2a6c 0%, #2c3e50 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            z-index: 30;
-            pointer-events: auto;
-            padding: 20px;
-        }
-
-        #start-screen h1 {
-            font-size: 42px;
-            color: #f1c40f;
-            text-shadow: 0 0 20px rgba(241, 196, 15, 0.8), 0 4px 10px rgba(0,0,0,0.5);
-            margin-bottom: 8px;
-            letter-spacing: 3px;
-        }
-
-        #start-screen > p {
-            font-size: 14px;
-            color: #bdc3c7;
-            margin-bottom: 25px;
-            letter-spacing: 2px;
-        }
-
-        .high-score-box {
-            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-            border: 3px solid #fff;
-            border-radius: 16px;
-            padding: 12px 35px;
-            margin-bottom: 25px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.5);
-            animation: glow 2s infinite alternate;
-        }
-
-        @keyframes glow {
-            from { box-shadow: 0 10px 30px rgba(243, 156, 18, 0.5); }
-            to { box-shadow: 0 10px 40px rgba(243, 156, 18, 0.9); }
-        }
-
-        .high-score-box .trophy {
-            font-size: 28px;
-            margin-bottom: 3px;
-        }
-
-        .high-score-box .label {
-            font-size: 12px;
-            color: #fff;
-            letter-spacing: 2px;
-            font-weight: bold;
-            margin-bottom: 3px;
-        }
-
-        .high-score-box .value {
-            font-size: 34px;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.4);
-        }
-
-        #play-btn {
-            padding: 16px 60px;
-            font-size: 24px;
-            font-weight: bold;
-            color: #fff;
-            background: linear-gradient(180deg, #27ae60 0%, #1e8449 100%);
-            border: 4px solid #fff;
-            border-radius: 60px;
-            cursor: pointer;
-            letter-spacing: 3px;
-            box-shadow: 0 10px 30px rgba(39, 174, 96, 0.6), inset 0 -4px 0 rgba(0,0,0,0.3);
-            transition: all 0.2s;
-            animation: pulse 2s infinite;
-            margin-bottom: 12px;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        #start-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a2a6c 0%, #2c3e50 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 30; pointer-events: auto; padding: 20px; }
+        #start-screen h1 { font-size: 42px; color: #f1c40f; text-shadow: 0 0 20px rgba(241, 196, 15, 0.8), 0 4px 10px rgba(0,0,0,0.5); margin-bottom: 8px; letter-spacing: 3px; }
+        #start-screen > p { font-size: 14px; color: #bdc3c7; margin-bottom: 25px; letter-spacing: 2px; }
+        .high-score-box { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); border: 3px solid #fff; border-radius: 16px; padding: 12px 35px; margin-bottom: 25px; text-align: center; box-shadow: 0 10px 30px rgba(243, 156, 18, 0.5); animation: glow 2s infinite alternate; }
+        @keyframes glow { from { box-shadow: 0 10px 30px rgba(243, 156, 18, 0.5); } to { box-shadow: 0 10px 40px rgba(243, 156, 18, 0.9); } }
+        .high-score-box .trophy { font-size: 28px; margin-bottom: 3px; }
+        .high-score-box .label { font-size: 12px; color: #fff; letter-spacing: 2px; font-weight: bold; margin-bottom: 3px; }
+        .high-score-box .value { font-size: 34px; font-weight: bold; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+        #play-btn { padding: 16px 60px; font-size: 24px; font-weight: bold; color: #fff; background: linear-gradient(180deg, #27ae60 0%, #1e8449 100%); border: 4px solid #fff; border-radius: 60px; cursor: pointer; letter-spacing: 3px; box-shadow: 0 10px 30px rgba(39, 174, 96, 0.6), inset 0 -4px 0 rgba(0,0,0,0.3); transition: all 0.2s; animation: pulse 2s infinite; margin-bottom: 12px; -webkit-tap-highlight-color: transparent; }
         #play-btn:hover { transform: scale(1.05); }
         #play-btn:active { transform: scale(0.95); }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 10px 30px rgba(39, 174, 96, 0.6), inset 0 -4px 0 rgba(0,0,0,0.3); }
-            50% { box-shadow: 0 10px 50px rgba(39, 174, 96, 1), inset 0 -4px 0 rgba(0,0,0,0.3); }
-            100% { box-shadow: 0 10px 30px rgba(39, 174, 96, 0.6), inset 0 -4px 0 rgba(0,0,0,0.3); }
-        }
-
-        #reset-btn {
-            padding: 7px 18px;
-            font-size: 11px;
-            font-weight: bold;
-            color: #fff;
-            background: rgba(231, 76, 60, 0.7);
-            border: 2px solid rgba(255,255,255,0.5);
-            border-radius: 18px;
-            cursor: pointer;
-            letter-spacing: 1px;
-            transition: all 0.2s;
-        }
-
+        @keyframes pulse { 0% { box-shadow: 0 10px 30px rgba(39, 174, 96, 0.6), inset 0 -4px 0 rgba(0,0,0,0.3); } 50% { box-shadow: 0 10px 50px rgba(39, 174, 96, 1), inset 0 -4px 0 rgba(0,0,0,0.3); } 100% { box-shadow: 0 10px 30px rgba(39, 174, 96, 0.6), inset 0 -4px 0 rgba(0,0,0,0.3); } }
+        #reset-btn { padding: 7px 18px; font-size: 11px; font-weight: bold; color: #fff; background: rgba(231, 76, 60, 0.7); border: 2px solid rgba(255,255,255,0.5); border-radius: 18px; cursor: pointer; letter-spacing: 1px; transition: all 0.2s; }
         #reset-btn:hover { background: rgba(231, 76, 60, 1); }
-
-        .privacy-link {
-            color: #bdc3c7;
-            font-size: 11px;
-            margin-top: 15px;
-            text-decoration: underline;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .privacy-link:hover {
-            color: #f1c40f;
-        }
-
-        .hidden {
-            display: none !important;
-        }
+        .privacy-link { color: #bdc3c7; font-size: 11px; margin-top: 15px; text-decoration: underline; cursor: pointer; transition: color 0.2s; }
+        .privacy-link:hover { color: #f1c40f; }
+        .hidden { display: none !important; }
 
         /* === GAME OVER === */
-        #game-over {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.92);
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            z-index: 20;
-            pointer-events: auto;
-            padding: 20px;
-        }
-        #game-over h1 { 
-            font-size: 36px; 
-            color: #e74c3c; 
-            margin-bottom: 12px; 
-            text-shadow: 0 0 10px #e74c3c; 
-        }
-        
-        #new-record-badge {
-            display: none;
-            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-            color: white;
-            padding: 7px 22px;
-            border-radius: 18px;
-            font-size: 12px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin-bottom: 12px;
-            border: 2px solid #fff;
-            animation: bounce 0.6s infinite alternate;
-        }
-
-        @keyframes bounce {
-            from { transform: scale(1); }
-            to { transform: scale(1.1); }
-        }
-        
-        .game-over-stats {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        .stat-box {
-            background: rgba(26, 42, 108, 0.9);
-            border: 2px solid #fff;
-            border-radius: 12px;
-            padding: 10px 20px;
-            text-align: center;
-            min-width: 90px;
-        }
-        
-        .stat-box .stat-label {
-            font-size: 10px;
-            color: #f1c40f;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
-        }
-        
-        .stat-box .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-        }
-        
+        #game-over { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.92); display: none; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 20; pointer-events: auto; padding: 20px; }
+        #game-over h1 { font-size: 36px; color: #e74c3c; margin-bottom: 12px; text-shadow: 0 0 10px #e74c3c; }
+        #new-record-badge { display: none; background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: white; padding: 7px 22px; border-radius: 18px; font-size: 12px; font-weight: bold; letter-spacing: 2px; margin-bottom: 12px; border: 2px solid #fff; animation: bounce 0.6s infinite alternate; }
+        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1); } }
+        .game-over-stats { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        .stat-box { background: rgba(26, 42, 108, 0.9); border: 2px solid #fff; border-radius: 12px; padding: 10px 20px; text-align: center; min-width: 90px; }
+        .stat-box .stat-label { font-size: 10px; color: #f1c40f; letter-spacing: 1px; margin-bottom: 4px; }
+        .stat-box .stat-value { font-size: 24px; font-weight: bold; color: white; }
         .stat-box.coin-stat .stat-value { color: #ffd700; }
+        .stat-box.high-stat { background: rgba(243, 156, 18, 0.9); border-color: #ffd700; }
+        #restart-btn { padding: 14px 40px; font-size: 18px; background: #f1c40f; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: #333; box-shadow: 0 5px 15px rgba(241, 196, 15, 0.4); }
 
-        .stat-box.high-stat {
-            background: rgba(243, 156, 18, 0.9);
-            border-color: #ffd700;
-        }
-        
-        #restart-btn {
-            padding: 14px 40px;
-            font-size: 18px;
-            background: #f1c40f;
-            border: none;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #333;
-            box-shadow: 0 5px 15px rgba(241, 196, 15, 0.4);
-        }
-
-        /* ==========================================
-           === LANDSCAPE MODE (બધા ફોન માટે) ===
-           ========================================== */
+        /* === LANDSCAPE MODE === */
         @media (orientation: landscape) {
-            #game-container {
-                max-width: 100%;
-                max-height: 100%;
-            }
-            
-            #start-screen {
-                padding: 10px;
-            }
-            
-            #start-screen h1 { 
-                font-size: 28px; 
-                margin-bottom: 3px; 
-                letter-spacing: 2px;
-            }
-            #start-screen > p { 
-                font-size: 10px; 
-                margin-bottom: 10px; 
-                letter-spacing: 1px;
-            }
-            
-            .high-score-box { 
-                padding: 6px 22px; 
-                margin-bottom: 10px;
-                border-radius: 12px;
-            }
+            #game-container { max-width: 100%; max-height: 100%; }
+            #start-screen { padding: 10px; }
+            #start-screen h1 { font-size: 28px; margin-bottom: 3px; letter-spacing: 2px; }
+            #start-screen > p { font-size: 10px; margin-bottom: 10px; letter-spacing: 1px; }
+            .high-score-box { padding: 6px 22px; margin-bottom: 10px; border-radius: 12px; }
             .high-score-box .value { font-size: 22px; }
             .high-score-box .trophy { font-size: 16px; margin-bottom: 1px; }
             .high-score-box .label { font-size: 9px; margin-bottom: 1px; }
-            
-            #play-btn { 
-                padding: 9px 40px; 
-                font-size: 17px; 
-                margin-bottom: 6px;
-                border-width: 3px;
-                letter-spacing: 2px;
-            }
-            
-            #reset-btn { 
-                padding: 4px 14px; 
-                font-size: 9px; 
-            }
-            .privacy-link { 
-                font-size: 9px; 
-                margin-top: 6px; 
-            }
-            
-            .controls { 
-                padding: 0 40px; 
-                bottom: 10px; 
-            }
-            .control-btn { 
-                width: 58px; 
-                height: 58px; 
-                font-size: 22px; 
-                border-width: 2px;
-            }
-            
-            .speedometer {
-                width: 62px;
-                height: 62px;
-                bottom: 78px;
-                right: 10px;
-                border-width: 3px;
-            }
+            #play-btn { padding: 9px 40px; font-size: 17px; margin-bottom: 6px; border-width: 3px; letter-spacing: 2px; }
+            #reset-btn { padding: 4px 14px; font-size: 9px; }
+            .privacy-link { font-size: 9px; margin-top: 6px; }
+            .controls { padding: 0 40px; bottom: 10px; }
+            .control-btn { width: 58px; height: 58px; font-size: 22px; border-width: 2px; }
+            .speedometer { width: 62px; height: 62px; bottom: 78px; right: 10px; border-width: 3px; }
             .speedometer .speed-val { font-size: 16px; }
             .speedometer .speed-unit { font-size: 8px; }
-            
-            .score-board { 
-                padding: 5px 12px; 
-                top: 10px; 
-                left: 10px; 
-                border-radius: 8px;
-            }
+            .score-board { padding: 5px 12px; top: 10px; left: 10px; border-radius: 8px; }
             .score-board strong { font-size: 17px; }
             .score-board span { font-size: 9px; }
-            
-            .coin-board { 
-                padding: 4px 14px; 
-                top: 10px; 
-                min-width: 65px;
-                border-radius: 16px;
-            }
+            .coin-board { padding: 4px 14px; top: 10px; min-width: 65px; border-radius: 16px; }
             .coin-board .coin-value { font-size: 17px; }
             .coin-board .coin-label { font-size: 8px; margin-bottom: 1px; }
-            
-            .pause-btn { 
-                width: 34px; 
-                height: 34px; 
-                top: 10px; 
-                right: 10px; 
-                font-size: 15px;
-                border-radius: 8px;
-            }
-            .sound-btn { 
-                width: 34px; 
-                height: 34px; 
-                top: 10px; 
-                right: 52px; 
-                font-size: 14px;
-                border-radius: 8px;
-            }
-            
-            #game-over {
-                padding: 10px;
-            }
-            #game-over h1 { 
-                font-size: 26px; 
-                margin-bottom: 6px; 
-            }
-            #new-record-badge {
-                padding: 5px 18px;
-                font-size: 10px;
-                margin-bottom: 8px;
-            }
-            .game-over-stats { 
-                gap: 8px; 
-                margin-bottom: 12px; 
-            }
-            .stat-box { 
-                padding: 7px 14px; 
-                min-width: 72px; 
-                border-radius: 10px;
-            }
+            .pause-btn { width: 34px; height: 34px; top: 10px; right: 10px; font-size: 15px; border-radius: 8px; }
+            .sound-btn { width: 34px; height: 34px; top: 10px; right: 52px; font-size: 14px; border-radius: 8px; }
+            #game-over { padding: 10px; }
+            #game-over h1 { font-size: 26px; margin-bottom: 6px; }
+            #new-record-badge { padding: 5px 18px; font-size: 10px; margin-bottom: 8px; }
+            .game-over-stats { gap: 8px; margin-bottom: 12px; }
+            .stat-box { padding: 7px 14px; min-width: 72px; border-radius: 10px; }
             .stat-box .stat-value { font-size: 19px; }
             .stat-box .stat-label { font-size: 8px; margin-bottom: 2px; }
-            #restart-btn { 
-                padding: 10px 32px; 
-                font-size: 15px; 
-                border-radius: 10px;
-            }
+            #restart-btn { padding: 10px 32px; font-size: 15px; border-radius: 10px; }
         }
 
-        /* === SMALL SCREENS (ઊભા મોડમાં નાના ફોન) === */
+        /* === SMALL SCREENS === */
         @media (max-width: 360px) and (orientation: portrait) {
             #start-screen h1 { font-size: 34px; }
             .high-score-box { padding: 10px 25px; }
@@ -613,7 +119,6 @@
 <body>
 
     <div id="game-container">
-        
         <!-- LOADING SCREEN -->
         <div id="loading-screen">
             <h1>CAR RACING</h1>
@@ -627,114 +132,127 @@
         <div id="start-screen" class="hidden">
             <h1>CAR RACING</h1>
             <p>3D RACING GAME</p>
-            
             <div class="high-score-box">
                 <div class="trophy">🏆</div>
                 <div class="label">HIGH SCORE</div>
                 <div class="value" id="high-score-start">0</div>
             </div>
-            
             <button id="play-btn">▶ PLAY</button>
             <button id="reset-btn">RESET SCORE</button>
-            
             <a href="privacy.html" class="privacy-link">Privacy Policy</a>
         </div>
 
         <!-- UI LAYER -->
         <div id="ui-layer" class="hidden">
-            <div class="score-board">
-                <span>SCORE</span>
-                <strong id="score">0</strong>
-            </div>
-            
-            <div class="coin-board">
-                <span class="coin-label">COINS</span>
-                <span class="coin-value" id="coins">0</span>
-            </div>
-            
+            <div class="score-board"><span>SCORE</span><strong id="score">0</strong></div>
+            <div class="coin-board"><span class="coin-label">COINS</span><span class="coin-value" id="coins">0</span></div>
             <div class="sound-btn" id="sound-btn">🔊</div>
             <div class="pause-btn" id="pause-btn">||</div>
-            
-            <div class="speedometer">
-                <div class="speed-val" id="speed">115</div>
-                <div class="speed-unit">KM/H</div>
-            </div>
-
-            <div class="controls">
-                <div class="control-btn" id="left-btn">←</div>
-                <div class="control-btn" id="right-btn">→</div>
-            </div>
+            <div class="speedometer"><div class="speed-val" id="speed">115</div><div class="speed-unit">KM/H</div></div>
+            <div class="controls"><div class="control-btn" id="left-btn">←</div><div class="control-btn" id="right-btn">→</div></div>
         </div>
 
         <!-- GAME OVER SCREEN -->
         <div id="game-over">
             <h1>GAME OVER</h1>
-            
             <div id="new-record-badge">🎉 NEW HIGH SCORE! 🎉</div>
-            
             <div class="game-over-stats">
-                <div class="stat-box">
-                    <div class="stat-label">SCORE</div>
-                    <div class="stat-value" id="final-score">0</div>
-                </div>
-                <div class="stat-box coin-stat">
-                    <div class="stat-label">COINS</div>
-                    <div class="stat-value" id="final-coins">0</div>
-                </div>
-                <div class="stat-box high-stat">
-                    <div class="stat-label">HIGH SCORE</div>
-                    <div class="stat-value" id="final-high-score">0</div>
-                </div>
+                <div class="stat-box"><div class="stat-label">SCORE</div><div class="stat-value" id="final-score">0</div></div>
+                <div class="stat-box coin-stat"><div class="stat-label">COINS</div><div class="stat-value" id="final-coins">0</div></div>
+                <div class="stat-box high-stat"><div class="stat-label">HIGH SCORE</div><div class="stat-value" id="final-high-score">0</div></div>
             </div>
             <button id="restart-btn">PLAY AGAIN</button>
         </div>
     </div>
+
+    <!-- YOUTUBE PLAYABLES SDK (સૌથી પહેલા લોડ કરો) -->
+    <script src="https://www.youtube.com/game_api/v1"></script>
 
     <!-- LOCAL THREE.JS -->
     <script src="three.min.js"></script>
 
     <script>
         // ==========================================
-        // === LOADING SYSTEM ===
+        // === YOUTUBE PLAYABLES SDK INTEGRATION ===
         // ==========================================
-        let loadProgress = 0;
-        const loadingBar = document.getElementById('loading-bar');
-        const loadingText = document.getElementById('loading-text');
-        const loadingScreen = document.getElementById('loading-screen');
-        const startScreenEl = document.getElementById('start-screen');
-        const uiLayer = document.getElementById('ui-layer');
+        let ytgame = null;
+        let isInPlayables = false;
 
-        function updateLoading(percent) {
-            loadProgress = percent;
-            loadingBar.style.width = percent + '%';
-            loadingText.innerText = 'LOADING... ' + percent + '%';
+        // SDK ઉપલબ્ધ છે કે નહીં તે તપાસો
+        function checkPlayables() {
+            if (typeof ytgame !== 'undefined' && ytgame) {
+                isInPlayables = true;
+                console.log('YouTube Playables SDK detected');
+            } else {
+                console.log('Running outside Playables environment');
+            }
+        }
+        checkPlayables();
+
+        // === SDK ફંક્શન્સ ===
+        function notifyFirstFrame() {
+            if (ytgame && ytgame.game) {
+                ytgame.game.firstFrameReady();
+                console.log('firstFrameReady() called');
+            }
         }
 
-        let loadingInterval = setInterval(() => {
-            if (loadProgress < 100) {
-                updateLoading(Math.min(loadProgress + 20, 100));
-            } else {
-                clearInterval(loadingInterval);
-                setTimeout(() => {
-                    loadingScreen.classList.add('hidden');
-                    startScreenEl.classList.remove('hidden');
-                    uiLayer.classList.remove('hidden');
-                }, 300);
+        function notifyGameReady() {
+            if (ytgame && ytgame.game) {
+                ytgame.game.gameReady();
+                console.log('gameReady() called');
             }
-        }, 150);
+        }
+
+        function onPause(callback) {
+            if (ytgame && ytgame.system) {
+                ytgame.system.onPause(callback);
+            }
+        }
+
+        function onResume(callback) {
+            if (ytgame && ytgame.system) {
+                ytgame.system.onResume(callback);
+            }
+        }
+
+        async function loadData() {
+            if (ytgame && ytgame.game) {
+                try {
+                    const data = await ytgame.game.loadData();
+                    return data;
+                } catch (e) {
+                    console.error('loadData failed:', e);
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        async function saveData(data) {
+            if (ytgame && ytgame.game) {
+                try {
+                    await ytgame.game.saveData(data);
+                    return true;
+                } catch (e) {
+                    console.error('saveData failed:', e);
+                    return false;
+                }
+            }
+            return false;
+        }
 
         // ==========================================
-        // === HIGH SCORE SYSTEM ===
+        // === HIGH SCORE SYSTEM (LocalStorage + Cloud) ===
         // ==========================================
         const HIGH_SCORE_KEY = 'carRacing3D_highScore';
+        let cloudHighScore = 0;
 
         function getHighScore() {
             try {
                 const saved = localStorage.getItem(HIGH_SCORE_KEY);
                 return saved ? parseInt(saved) : 0;
-            } catch(e) {
-                return 0;
-            }
+            } catch (e) { return 0; }
         }
 
         function saveHighScore(newScore) {
@@ -742,21 +260,34 @@
                 const currentHigh = getHighScore();
                 if (newScore > currentHigh) {
                     localStorage.setItem(HIGH_SCORE_KEY, newScore.toString());
+                    // Cloud માં પણ સેવ કરો
+                    saveCloudData(newScore);
                     return true;
                 }
                 return false;
-            } catch(e) {
-                return false;
+            } catch (e) { return false; }
+        }
+
+        async function saveCloudData(score) {
+            const data = { highScore: score };
+            await saveData(JSON.stringify(data));
+        }
+
+        async function loadCloudData() {
+            const data = await loadData();
+            if (data) {
+                try {
+                    const parsed = JSON.parse(data);
+                    if (parsed.highScore && parsed.highScore > getHighScore()) {
+                        localStorage.setItem(HIGH_SCORE_KEY, parsed.highScore.toString());
+                    }
+                } catch (e) {}
             }
         }
 
         function resetHighScore() {
-            try {
-                localStorage.removeItem(HIGH_SCORE_KEY);
-            } catch(e) {}
+            try { localStorage.removeItem(HIGH_SCORE_KEY); } catch (e) {}
         }
-
-        document.getElementById('high-score-start').innerText = getHighScore();
 
         // ==========================================
         // === SOUND ENGINE ===
@@ -766,12 +297,40 @@
 
         function initAudio() {
             if (!audioCtx) {
-                try {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                } catch(e) {}
+                try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
             }
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
+            if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); }
+        }
+
+        // === SDK Audio Integration ===
+        function setupAudioHandlers() {
+            if (ytgame && ytgame.system) {
+                // Audio state પ્રાપ્ત કરો
+                ytgame.system.isAudioEnabled().then((enabled) => {
+                    soundEnabled = enabled;
+                    updateSoundButton();
+                }).catch(() => {});
+
+                // Audio state change handler
+                ytgame.system.onAudioEnabledChange((enabled) => {
+                    soundEnabled = enabled;
+                    updateSoundButton();
+                    if (!enabled) {
+                        stopBackgroundMusic();
+                        stopEngineSound();
+                    }
+                });
+            }
+        }
+
+        function updateSoundButton() {
+            const btn = document.getElementById('sound-btn');
+            if (soundEnabled) {
+                btn.innerText = '🔊';
+                btn.classList.remove('muted');
+            } else {
+                btn.innerText = '🔇';
+                btn.classList.add('muted');
             }
         }
 
@@ -781,14 +340,11 @@
         function startBackgroundMusic() {
             if (!soundEnabled || !audioCtx) return;
             stopBackgroundMusic();
-            
             bgMusicGain = audioCtx.createGain();
             bgMusicGain.gain.value = 0.06;
             bgMusicGain.connect(audioCtx.destination);
-
             const notes = [220, 261.63, 329.63, 392, 329.63, 261.63];
             let noteIndex = 0;
-
             bgMusicInterval = setInterval(() => {
                 if (!soundEnabled || !audioCtx) return;
                 const osc = audioCtx.createOscillator();
@@ -806,10 +362,7 @@
         }
 
         function stopBackgroundMusic() {
-            if (bgMusicInterval) {
-                clearInterval(bgMusicInterval);
-                bgMusicInterval = null;
-            }
+            if (bgMusicInterval) { clearInterval(bgMusicInterval); bgMusicInterval = null; }
         }
 
         let engineOsc = null;
@@ -818,17 +371,14 @@
         function startEngineSound() {
             if (!soundEnabled || !audioCtx) return;
             stopEngineSound();
-            
             engineOsc = audioCtx.createOscillator();
             engineGain = audioCtx.createGain();
             engineOsc.type = 'sawtooth';
             engineOsc.frequency.value = 60;
             engineGain.gain.value = 0.02;
-            
             const filter = audioCtx.createBiquadFilter();
             filter.type = 'lowpass';
             filter.frequency.value = 200;
-            
             engineOsc.connect(filter);
             filter.connect(engineGain);
             engineGain.connect(audioCtx.destination);
@@ -836,10 +386,7 @@
         }
 
         function stopEngineSound() {
-            if (engineOsc) {
-                try { engineOsc.stop(); } catch(e) {}
-                engineOsc = null;
-            }
+            if (engineOsc) { try { engineOsc.stop(); } catch (e) {} engineOsc = null; }
         }
 
         function playCrashSound() {
@@ -847,9 +394,7 @@
             const bufferSize = audioCtx.sampleRate * 0.5;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
-            }
+            for (let i = 0; i < bufferSize; i++) { data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize); }
             const noise = audioCtx.createBufferSource();
             noise.buffer = buffer;
             const gain = audioCtx.createGain();
@@ -979,17 +524,14 @@
 
         // === Three.js ===
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87CEEB); 
+        scene.background = new THREE.Color(0x87CEEB);
         scene.fog = new THREE.Fog(0x87CEEB, 50, 130);
 
         const camera = new THREE.PerspectiveCamera(60, gameContainer.clientWidth / gameContainer.clientHeight, 0.1, 1000);
         camera.position.set(0, 6, 12);
         camera.lookAt(0, 0, -10);
 
-        const renderer = new THREE.WebGLRenderer({ 
-            antialias: true,
-            powerPreference: 'high-performance'
-        });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
         renderer.setSize(gameContainer.clientWidth, gameContainer.clientHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.shadowMap.enabled = true;
@@ -1014,35 +556,26 @@
 
         function createCar(color) {
             const carGroup = new THREE.Group();
-
             const bodyGeo = new THREE.BoxGeometry(2, 0.8, 4);
             const bodyMat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.3, metalness: 0.5 });
             const body = new THREE.Mesh(bodyGeo, bodyMat);
             body.position.y = 0.4;
             body.castShadow = true;
             carGroup.add(body);
-
             const cabinGeo = new THREE.BoxGeometry(1.6, 0.7, 2);
             const cabinMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.1 });
             const cabin = new THREE.Mesh(cabinGeo, cabinMat);
             cabin.position.set(0, 1.1, -0.2);
             cabin.castShadow = true;
             carGroup.add(cabin);
-
             const glassGeo = new THREE.BoxGeometry(1.5, 0.5, 0.1);
             const glassMat = new THREE.MeshStandardMaterial({ color: 0x88ccff, transparent: true, opacity: 0.7 });
             const glass = new THREE.Mesh(glassGeo, glassMat);
             glass.position.set(0, 1.1, 0.9);
             carGroup.add(glass);
-
             const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.3, 16);
             const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
-            
-            const wheelPositions = [
-                [-1.0, 0.4, 1.2], [1.0, 0.4, 1.2],
-                [-1.0, 0.4, -1.2], [1.0, 0.4, -1.2]
-            ];
-
+            const wheelPositions = [[-1.0, 0.4, 1.2], [1.0, 0.4, 1.2], [-1.0, 0.4, -1.2], [1.0, 0.4, -1.2]];
             wheelPositions.forEach(pos => {
                 const wheel = new THREE.Mesh(wheelGeo, wheelMat);
                 wheel.rotation.z = Math.PI / 2;
@@ -1050,7 +583,6 @@
                 wheel.castShadow = true;
                 carGroup.add(wheel);
             });
-
             return carGroup;
         }
 
@@ -1086,7 +618,6 @@
         grassLeft.position.set(-105, -0.1, -roadLength / 2 + 10);
         grassLeft.receiveShadow = true;
         scene.add(grassLeft);
-
         const grassRight = new THREE.Mesh(grassGeo, grassMat);
         grassRight.rotation.x = -Math.PI / 2;
         grassRight.position.set(105, -0.1, -roadLength / 2 + 10);
@@ -1097,121 +628,79 @@
         function createCloud(x, y, z) {
             const cloudGroup = new THREE.Group();
             const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, roughness: 1 });
-            
-            const parts = [
-                { r: 2, x: 0, y: 0, z: 0 },
-                { r: 1.5, x: 1.8, y: -0.2, z: 0 },
-                { r: 1.5, x: -1.8, y: -0.2, z: 0 },
-                { r: 1.2, x: 0.8, y: 0.8, z: 0 }
-            ];
-            
+            const parts = [{ r: 2, x: 0, y: 0, z: 0 }, { r: 1.5, x: 1.8, y: -0.2, z: 0 }, { r: 1.5, x: -1.8, y: -0.2, z: 0 }, { r: 1.2, x: 0.8, y: 0.8, z: 0 }];
             parts.forEach(p => {
                 const geo = new THREE.SphereGeometry(p.r, 8, 8);
                 const mesh = new THREE.Mesh(geo, cloudMat);
                 mesh.position.set(p.x, p.y, p.z);
                 cloudGroup.add(mesh);
             });
-            
             cloudGroup.position.set(x, y, z);
             scene.add(cloudGroup);
             clouds.push(cloudGroup);
         }
-
-        for (let i = 0; i < 15; i++) {
-            const x = (Math.random() - 0.5) * 120;
-            const y = 20 + Math.random() * 20;
-            const z = -Math.random() * 180;
-            createCloud(x, y, z);
-        }
+        for (let i = 0; i < 15; i++) { createCloud((Math.random() - 0.5) * 120, 20 + Math.random() * 20, -Math.random() * 180); }
 
         const trees = [];
         function createTree(x, z, scale) {
             const treeGroup = new THREE.Group();
-
             const trunkGeo = new THREE.CylinderGeometry(0.3, 0.4, 2, 6);
             const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8B4513, roughness: 1 });
             const trunk = new THREE.Mesh(trunkGeo, trunkMat);
             trunk.position.y = 1;
             trunk.castShadow = true;
             treeGroup.add(trunk);
-
             const leafMat = new THREE.MeshStandardMaterial({ color: 0x229954, roughness: 1, flatShading: true });
-            
             const leaf1 = new THREE.Mesh(new THREE.ConeGeometry(2, 2.5, 6), leafMat);
             leaf1.position.y = 2.5;
             leaf1.castShadow = true;
             treeGroup.add(leaf1);
-
             const leaf2 = new THREE.Mesh(new THREE.ConeGeometry(1.6, 2, 6), leafMat);
             leaf2.position.y = 3.8;
             leaf2.castShadow = true;
             treeGroup.add(leaf2);
-
             const leaf3 = new THREE.Mesh(new THREE.ConeGeometry(1.1, 1.8, 6), leafMat);
             leaf3.position.y = 5;
             leaf3.castShadow = true;
             treeGroup.add(leaf3);
-
             treeGroup.position.set(x, 0, z);
             treeGroup.scale.set(scale, scale, scale);
             scene.add(treeGroup);
             trees.push(treeGroup);
         }
-
-        for (let i = 0; i < 30; i++) {
-            const z = -10 - i * 8;
-            createTree(-8 - Math.random() * 10, z, 0.8 + Math.random() * 0.5);
-            createTree(8 + Math.random() * 10, z, 0.8 + Math.random() * 0.5);
-        }
+        for (let i = 0; i < 30; i++) { createTree(-8 - Math.random() * 10, -10 - i * 8, 0.8 + Math.random() * 0.5); createTree(8 + Math.random() * 10, -10 - i * 8, 0.8 + Math.random() * 0.5); }
 
         const enemies = [];
-
         function spawnEnemy() {
             const colors = [0xf39c12, 0x3498db, 0x9b59b6, 0x1abc9c];
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            const enemy = createCar(randomColor);
-            
+            const enemy = createCar(colors[Math.floor(Math.random() * colors.length)]);
             const lanes = [-3, 0, 3];
-            const randomLane = lanes[Math.floor(Math.random() * lanes.length)];
-            enemy.position.set(randomLane, 0, -80);
-            
+            enemy.position.set(lanes[Math.floor(Math.random() * lanes.length)], 0, -80);
             scene.add(enemy);
             enemies.push(enemy);
         }
 
         const coinObjects = [];
-        
         function createCoin(x, z) {
             const coinGroup = new THREE.Group();
-            
             const coinGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.15, 16);
-            const coinMat = new THREE.MeshStandardMaterial({ 
-                color: 0xffd700, 
-                metalness: 0.9, 
-                roughness: 0.2,
-                emissive: 0xaa8800,
-                emissiveIntensity: 0.3
-            });
+            const coinMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9, roughness: 0.2, emissive: 0xaa8800, emissiveIntensity: 0.3 });
             const coin = new THREE.Mesh(coinGeo, coinMat);
             coin.rotation.x = Math.PI / 2;
             coin.castShadow = true;
             coinGroup.add(coin);
-
             const innerGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.17, 16);
             const innerMat = new THREE.MeshStandardMaterial({ color: 0xffaa00, metalness: 0.9, roughness: 0.2 });
             const inner = new THREE.Mesh(innerGeo, innerMat);
             inner.rotation.x = Math.PI / 2;
             coinGroup.add(inner);
-
             coinGroup.position.set(x, 1, z);
             scene.add(coinGroup);
             coinObjects.push(coinGroup);
         }
-
         function spawnCoin() {
             const lanes = [-3, 0, 3];
-            const randomLane = lanes[Math.floor(Math.random() * lanes.length)];
-            createCoin(randomLane, -80);
+            createCoin(lanes[Math.floor(Math.random() * lanes.length)], -80);
         }
 
         // === CONTROLS ===
@@ -1229,7 +718,6 @@
         leftBtn.addEventListener('touchstart', handleLeftStart, { passive: false });
         leftBtn.addEventListener('touchend', handleLeftEnd, { passive: false });
         leftBtn.addEventListener('touchcancel', handleLeftEnd, { passive: false });
-
         rightBtn.addEventListener('mousedown', handleRightStart);
         rightBtn.addEventListener('mouseup', handleRightEnd);
         rightBtn.addEventListener('mouseleave', handleRightEnd);
@@ -1254,128 +742,65 @@
             if (isGameOver || isPaused || !gameStarted) return;
             gameLoopId = requestAnimationFrame(animate);
 
-            if (moveLeft && playerCar.position.x > -3.5) {
-                playerCar.position.x -= 0.15;
-                playerCar.rotation.z = 0.1;
-            } else if (moveRight && playerCar.position.x < 3.5) {
-                playerCar.position.x += 0.15;
-                playerCar.rotation.z = -0.1;
-            } else {
-                playerCar.rotation.z = 0;
-            }
+            if (moveLeft && playerCar.position.x > -3.5) { playerCar.position.x -= 0.15; playerCar.rotation.z = 0.1; }
+            else if (moveRight && playerCar.position.x < 3.5) { playerCar.position.x += 0.15; playerCar.rotation.z = -0.1; }
+            else { playerCar.rotation.z = 0; }
 
-            laneLines.forEach(line => {
-                line.position.z += gameSpeed;
-                if (line.position.z > 15) {
-                    line.position.z -= 160;
-                }
-            });
-
-            clouds.forEach(cloud => {
-                cloud.position.z += gameSpeed * 0.5;
-                if (cloud.position.z > 20) {
-                    cloud.position.z = -180;
-                    cloud.position.x = (Math.random() - 0.5) * 120;
-                }
-            });
-
-            trees.forEach(tree => {
-                tree.position.z += gameSpeed;
-                if (tree.position.z > 15) {
-                    tree.position.z -= 240;
-                    if (tree.position.x > 0) {
-                        tree.position.x = 8 + Math.random() * 10;
-                    } else {
-                        tree.position.x = -8 - Math.random() * 10;
-                    }
-                }
-            });
+            laneLines.forEach(line => { line.position.z += gameSpeed; if (line.position.z > 15) line.position.z -= 160; });
+            clouds.forEach(cloud => { cloud.position.z += gameSpeed * 0.5; if (cloud.position.z > 20) { cloud.position.z = -180; cloud.position.x = (Math.random() - 0.5) * 120; } });
+            trees.forEach(tree => { tree.position.z += gameSpeed; if (tree.position.z > 15) { tree.position.z -= 240; tree.position.x = tree.position.x > 0 ? 8 + Math.random() * 10 : -8 - Math.random() * 10; } });
 
             for (let i = coinObjects.length - 1; i >= 0; i--) {
                 const coinGroup = coinObjects[i];
                 coinGroup.position.z += gameSpeed;
                 coinGroup.rotation.y += 0.1;
-
                 const dx = Math.abs(playerCar.position.x - coinGroup.position.x);
                 const dz = Math.abs(playerCar.position.z - coinGroup.position.z);
-                
-                if (dx < 1.5 && dz < 2.5) {
-                    scene.remove(coinGroup);
-                    coinObjects.splice(i, 1);
-                    coins += 1;
-                    coinsEl.innerText = coins;
-                    playCoinSound();
-                    score += 5;
-                    scoreEl.innerText = score;
-                    continue;
-                }
-
-                if (coinGroup.position.z > 15) {
-                    scene.remove(coinGroup);
-                    coinObjects.splice(i, 1);
-                }
+                if (dx < 1.5 && dz < 2.5) { scene.remove(coinGroup); coinObjects.splice(i, 1); coins += 1; coinsEl.innerText = coins; playCoinSound(); score += 5; scoreEl.innerText = score; continue; }
+                if (coinGroup.position.z > 15) { scene.remove(coinGroup); coinObjects.splice(i, 1); }
             }
 
             enemySpawnCounter++;
-            if (enemySpawnCounter > 60) {
-                spawnEnemy();
-                enemySpawnCounter = 0;
-            }
-
+            if (enemySpawnCounter > 60) { spawnEnemy(); enemySpawnCounter = 0; }
             coinSpawnCounter++;
-            if (coinSpawnCounter > 90) {
-                spawnCoin();
-                coinSpawnCounter = 0;
-            }
+            if (coinSpawnCounter > 90) { spawnCoin(); coinSpawnCounter = 0; }
 
             for (let i = enemies.length - 1; i >= 0; i--) {
                 const enemy = enemies[i];
                 enemy.position.z += gameSpeed + 0.2;
-
                 const dx = Math.abs(playerCar.position.x - enemy.position.x);
                 const dz = Math.abs(playerCar.position.z - enemy.position.z);
-                
-                if (dx < 1.8 && dz < 3.5) {
-                    endGame();
-                    return;
-                }
-
+                if (dx < 1.8 && dz < 3.5) { endGame(); return; }
                 if (enemy.position.z > 15) {
-                    scene.remove(enemy);
-                    enemies.splice(i, 1);
-                    score += 10;
-                    scoreEl.innerText = score;
-                    
+                    scene.remove(enemy); enemies.splice(i, 1);
+                    score += 10; scoreEl.innerText = score;
                     const now = Date.now();
-                    if (now - lastScoreSoundTime > 300) {
-                        playScoreSound();
-                        lastScoreSoundTime = now;
-                    }
+                    if (now - lastScoreSoundTime > 300) { playScoreSound(); lastScoreSoundTime = now; }
                 }
             }
 
             score += 1;
             scoreEl.innerText = score;
-
-            if (score % 300 === 0) {
-                gameSpeed += 0.05;
-                speedEl.innerText = Math.floor(115 + (gameSpeed * 20));
-            }
+            if (score % 300 === 0) { gameSpeed += 0.05; speedEl.innerText = Math.floor(115 + (gameSpeed * 20)); }
 
             camera.position.x = playerCar.position.x * 0.5;
             camera.lookAt(playerCar.position.x * 0.5, 0, -10);
-
             renderer.render(scene, camera);
         }
 
-        playBtn.addEventListener('click', () => {
+        // ==========================================
+        // === GAME LIFECYCLE ===
+        // ==========================================
+        playBtn.addEventListener('click', async () => {
             initAudio();
             playClickSound();
             startScreenEl.classList.add('hidden');
             gameStarted = true;
-            startGame();
+            await startGame();
             startBackgroundMusic();
             startEngineSound();
+            // YouTube Playables: Game Ready
+            notifyGameReady();
         });
 
         resetBtn.addEventListener('click', () => {
@@ -1386,7 +811,7 @@
             }
         });
 
-        function startGame() {
+        async function startGame() {
             isGameOver = false;
             isPaused = false;
             gameStarted = true;
@@ -1396,16 +821,12 @@
             scoreEl.innerText = score;
             coinsEl.innerText = coins;
             speedEl.innerText = 115;
-            
             playerCar.position.set(0, 0, 0);
             playerCar.rotation.z = 0;
-            
             enemies.forEach(enemy => scene.remove(enemy));
             enemies.length = 0;
-            
             coinObjects.forEach(coin => scene.remove(coin));
             coinObjects.length = 0;
-            
             newRecordBadge.style.display = 'none';
             gameOverScreen.style.display = 'none';
             animate();
@@ -1415,77 +836,141 @@
             isGameOver = true;
             gameStarted = false;
             cancelAnimationFrame(gameLoopId);
-            
+
             const isNewRecord = saveHighScore(score);
             const currentHighScore = getHighScore();
-            
+
             finalScoreEl.innerText = score;
             finalCoinsEl.innerText = coins;
             finalHighScoreEl.innerText = currentHighScore;
-            
+
+            // YouTube Playables: Score સબમિટ કરો
+            if (ytgame && ytgame.engagement) {
+                ytgame.engagement.sendScore({ value: score }).catch(() => {});
+            }
+
             if (isNewRecord) {
                 newRecordBadge.style.display = 'block';
                 playHighScoreSound();
             } else {
                 newRecordBadge.style.display = 'none';
             }
-            
+
             highScoreStartEl.innerText = currentHighScore;
             gameOverScreen.style.display = 'flex';
-            
             playCrashSound();
             setTimeout(() => playGameOverSound(), 500);
-            
             stopEngineSound();
             stopBackgroundMusic();
         }
 
-        document.getElementById('restart-btn').addEventListener('click', () => {
+        document.getElementById('restart-btn').addEventListener('click', async () => {
             playClickSound();
             gameOverScreen.style.display = 'none';
-            startGame();
+            await startGame();
             startBackgroundMusic();
             startEngineSound();
+            // YouTube Playables: Game Ready
+            notifyGameReady();
         });
 
         function togglePause() {
             if (isGameOver || !gameStarted) return;
             isPaused = !isPaused;
             pauseBtn.innerText = isPaused ? '▶' : '||';
-            if (!isPaused) {
-                animate();
-                startBackgroundMusic();
-                startEngineSound();
-            } else {
-                stopBackgroundMusic();
-                stopEngineSound();
-            }
+            if (!isPaused) { animate(); startBackgroundMusic(); startEngineSound(); }
+            else { stopBackgroundMusic(); stopEngineSound(); }
         }
 
-        pauseBtn.addEventListener('click', () => {
-            playClickSound();
-            togglePause();
-        });
+        pauseBtn.addEventListener('click', () => { playClickSound(); togglePause(); });
 
         soundBtn.addEventListener('click', () => {
             soundEnabled = !soundEnabled;
+            updateSoundButton();
             if (soundEnabled) {
-                soundBtn.innerText = '🔊';
-                soundBtn.classList.remove('muted');
                 initAudio();
                 playClickSound();
-                if (gameStarted && !isPaused && !isGameOver) {
-                    startBackgroundMusic();
-                    startEngineSound();
-                }
+                if (gameStarted && !isPaused && !isGameOver) { startBackgroundMusic(); startEngineSound(); }
             } else {
-                soundBtn.innerText = '🔇';
-                soundBtn.classList.add('muted');
                 stopBackgroundMusic();
                 stopEngineSound();
             }
         });
 
+        // ==========================================
+        // === YOUTUBE PLAYABLES: PAUSE/RESUME HANDLERS ===
+        // ==========================================
+        onPause(() => {
+            console.log('Playables: Pause event received');
+            if (gameStarted && !isPaused && !isGameOver) {
+                isPaused = true;
+                pauseBtn.innerText = '▶';
+                stopBackgroundMusic();
+                stopEngineSound();
+                cancelAnimationFrame(gameLoopId);
+            }
+        });
+
+        onResume(() => {
+            console.log('Playables: Resume event received');
+            // Resume થાય ત્યારે ગેમ ચાલુ રાખવાનો વિકલ્પ
+            // (અમે યુઝરને મેન્યુઅલ રીસ્યુમ કરવા દઈએ છીએ)
+        });
+
+        // ==========================================
+        // === SDK INITIALIZATION ===
+        // ==========================================
+        async function initPlayables() {
+            // પહેલા ફ્રેમ તૈયાર છે તે જાહેર કરો
+            notifyFirstFrame();
+
+            // Cloud ડેટા લોડ કરો
+            await loadCloudData();
+            highScoreStartEl.innerText = getHighScore();
+
+            // Audio handlers સેટ કરો
+            setupAudioHandlers();
+
+            // પોઝ/રીસ્યુમ handlers સેટ કરો
+            // (ઉપર onPause/onResume ફંક્શન્સમાં થઈ ગયું)
+
+            console.log('YouTube Playables initialized');
+        }
+
+        // ==========================================
+        // === LOADING SYSTEM ===
+        // ==========================================
+        let loadProgress = 0;
+        const loadingBar = document.getElementById('loading-bar');
+        const loadingText = document.getElementById('loading-text');
+        const loadingScreen = document.getElementById('loading-screen');
+        const startScreenEl = document.getElementById('start-screen');
+        const uiLayer = document.getElementById('ui-layer');
+
+        function updateLoading(percent) {
+            loadProgress = percent;
+            loadingBar.style.width = percent + '%';
+            loadingText.innerText = 'LOADING... ' + percent + '%';
+        }
+
+        let loadingInterval = setInterval(async () => {
+            if (loadProgress < 100) {
+                updateLoading(Math.min(loadProgress + 20, 100));
+            } else {
+                clearInterval(loadingInterval);
+                // Playables init કરો
+                await initPlayables();
+                setTimeout(() => {
+                    loadingScreen.classList.add('hidden');
+                    startScreenEl.classList.remove('hidden');
+                    uiLayer.classList.remove('hidden');
+                }, 300);
+            }
+        }, 150);
+
+        // ==========================================
+        // === VISIBILITY & RESIZE ===
+        // ==========================================
         document.addEventListener('visibilitychange', () => {
             if (document.hidden && gameStarted && !isPaused && !isGameOver) {
                 isPaused = true;
@@ -1515,9 +1000,7 @@
         }
 
         window.addEventListener('resize', handleResize);
-        window.addEventListener('orientationchange', () => {
-            setTimeout(handleResize, 200);
-        });
+        window.addEventListener('orientationchange', () => { setTimeout(handleResize, 200); });
 
         renderer.render(scene, camera);
 
